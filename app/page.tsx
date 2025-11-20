@@ -72,7 +72,7 @@ export default function FlashcardApp() {
   const [allCards, setAllCards] = useState<Card[]>([]);
   const [loading, setLoading] = useState(true);
   const [darkMode, setDarkMode] = useState(false);
-  
+
   // 画面遷移管理
   const [currentScreen, setCurrentScreen] = useState<Screen>('MENU');
 
@@ -142,11 +142,11 @@ export default function FlashcardApp() {
         // 本番環境用にfetchを有効化
         // Vercel等のpublicフォルダにway.csvがあれば読み込まれます
         const response = await fetch('/way.csv');
-        
+
         if (!response.ok) {
           throw new Error(`CSV load failed: ${response.statusText}`);
         }
-        
+
         const text = await response.text();
         const data = parseCSV(text);
         setAllCards(data);
@@ -173,14 +173,14 @@ export default function FlashcardApp() {
       <div className="min-h-screen bg-gray-50 text-slate-800 dark:bg-slate-900 dark:text-slate-100 transition-colors duration-300">
         {/* ヘッダー (共通) */}
         <header className="p-4 bg-white dark:bg-slate-800 shadow-sm flex justify-between items-center sticky top-0 z-10">
-          <h1 
-            className="font-bold text-xl cursor-pointer flex items-center gap-2" 
+          <h1
+            className="font-bold text-xl cursor-pointer flex items-center gap-2"
             onClick={() => setCurrentScreen('MENU')}
           >
             <BookOpen className="w-6 h-6 text-blue-500" />
-            単語帳アプリ
+            N-Way-App
           </h1>
-          <button 
+          <button
             onClick={() => setDarkMode(!darkMode)}
             className="p-2 rounded-full hover:bg-gray-200 dark:hover:bg-slate-700 transition"
           >
@@ -190,18 +190,18 @@ export default function FlashcardApp() {
 
         <main className="p-4 max-w-3xl mx-auto">
           {/* 画面の状態管理をAppContentに集約 */}
-          <AppContent 
-             screen={currentScreen}
-             setScreen={setCurrentScreen}
-             allCards={allCards}
-             wrongHistory={wrongHistory}
-             setWrongHistory={setWrongHistory}
-             playQueue={playQueue}
-             setPlayQueue={setPlayQueue}
-             gameResults={gameResults}
-             setGameResults={setGameResults}
-             setupSource={setupSource}
-             setSetupSource={setSetupSource}
+          <AppContent
+            screen={currentScreen}
+            setScreen={setCurrentScreen}
+            allCards={allCards}
+            wrongHistory={wrongHistory}
+            setWrongHistory={setWrongHistory}
+            playQueue={playQueue}
+            setPlayQueue={setPlayQueue}
+            gameResults={gameResults}
+            setGameResults={setGameResults}
+            setupSource={setupSource}
+            setSetupSource={setSetupSource}
           />
         </main>
       </div>
@@ -234,10 +234,10 @@ function AppContent(props: {
 
   const handleStartGame = (newSettings: GameSettings) => {
     setSettings(newSettings);
-    
+
     // カード抽出ロジック
-    let sourceCards = props.setupSource === 'ALL' 
-      ? props.allCards 
+    let sourceCards = props.setupSource === 'ALL'
+      ? props.allCards
       : props.allCards.filter(c => (props.wrongHistory[c.id] || 0) > 0);
 
     let deck = [...sourceCards];
@@ -246,10 +246,10 @@ function AppContent(props: {
     if (newSettings.order === 'RANDOM') {
       deck = shuffleArray(deck);
     } else {
-        // 順番通りかつ開始位置指定 (ID順ではなく現在のリスト順)
-        if (newSettings.startIndex > 0) {
-            deck = deck.slice(newSettings.startIndex);
-        }
+      // 順番通りかつ開始位置指定 (ID順ではなく現在のリスト順)
+      if (newSettings.startIndex > 0) {
+        deck = deck.slice(newSettings.startIndex);
+      }
     }
 
     // 枚数制限
@@ -269,7 +269,7 @@ function AppContent(props: {
 
   const handleGameFinish = (results: GameResult[]) => {
     props.setGameResults(results);
-    
+
     // 履歴更新
     const newHistory = { ...props.wrongHistory };
     results.forEach(r => {
@@ -278,14 +278,14 @@ function AppContent(props: {
       }
     });
     props.setWrongHistory(newHistory);
-    
+
     props.setScreen('RESULT');
   };
 
   switch (props.screen) {
     case 'MENU':
       return (
-        <MenuScreen 
+        <MenuScreen
           allCount={props.allCards.length}
           wrongCount={Object.keys(props.wrongHistory).length}
           onStartAll={() => { props.setSetupSource('ALL'); props.setScreen('SETUP'); }}
@@ -295,7 +295,7 @@ function AppContent(props: {
       );
     case 'SETUP':
       return (
-        <SetupScreen 
+        <SetupScreen
           sourceType={props.setupSource}
           totalCards={props.setupSource === 'ALL' ? props.allCards.length : Object.keys(props.wrongHistory).length}
           onStart={handleStartGame}
@@ -304,7 +304,7 @@ function AppContent(props: {
       );
     case 'GAME':
       return (
-        <GameScreen 
+        <GameScreen
           cards={props.playQueue}
           settings={settings}
           onFinish={handleGameFinish}
@@ -313,20 +313,20 @@ function AppContent(props: {
       );
     case 'RESULT':
       return (
-        <ResultScreen 
+        <ResultScreen
           results={props.gameResults}
           allCards={props.allCards}
           onRetryWrong={() => {
-             // 間違えた問題だけを対象に設定画面へ
-             props.setSetupSource('WRONG');
-             props.setScreen('SETUP');
+            // 間違えた問題だけを対象に設定画面へ
+            props.setSetupSource('WRONG');
+            props.setScreen('SETUP');
           }}
           onBackToMenu={() => props.setScreen('MENU')}
         />
       );
     case 'WRONG_LIST':
       return (
-        <WrongListScreen 
+        <WrongListScreen
           allCards={props.allCards}
           wrongHistory={props.wrongHistory}
           onBack={() => props.setScreen('MENU')}
@@ -351,7 +351,7 @@ function MenuScreen({ allCount, wrongCount, onStartAll, onStartWrong, onShowWron
       </div>
 
       <div className="grid gap-4">
-        <button 
+        <button
           onClick={onStartAll}
           className="flex items-center justify-between bg-blue-600 hover:bg-blue-700 text-white p-6 rounded-xl shadow transition group"
         >
@@ -362,12 +362,12 @@ function MenuScreen({ allCount, wrongCount, onStartAll, onStartWrong, onShowWron
           <Play className="w-8 h-8 opacity-80 group-hover:translate-x-1 transition" />
         </button>
 
-        <button 
+        <button
           onClick={onStartWrong}
           disabled={wrongCount === 0}
           className={`flex items-center justify-between p-6 rounded-xl shadow transition group border-2
-            ${wrongCount === 0 
-              ? 'bg-gray-100 dark:bg-slate-800 border-gray-200 dark:border-slate-700 text-gray-400 cursor-not-allowed' 
+            ${wrongCount === 0
+              ? 'bg-gray-100 dark:bg-slate-800 border-gray-200 dark:border-slate-700 text-gray-400 cursor-not-allowed'
               : 'bg-white dark:bg-slate-800 border-red-200 dark:border-red-900 hover:border-red-400 dark:hover:border-red-700 text-red-600 dark:text-red-400'
             }`}
         >
@@ -377,8 +377,8 @@ function MenuScreen({ allCount, wrongCount, onStartAll, onStartWrong, onShowWron
           </div>
           <RefreshCw className={`w-8 h-8 ${wrongCount > 0 ? 'group-hover:rotate-180 transition duration-500' : ''}`} />
         </button>
-        
-        <button 
+
+        <button
           onClick={onShowWrongList}
           className="flex items-center justify-center gap-2 bg-white dark:bg-slate-800 hover:bg-gray-50 dark:hover:bg-slate-700 text-slate-600 dark:text-slate-300 p-4 rounded-xl shadow-sm border border-slate-200 dark:border-slate-700 transition"
         >
@@ -439,16 +439,16 @@ function SetupScreen({ sourceType, totalCards, onStart, onBack }: any) {
           <label className="block text-sm font-bold text-slate-500 mb-2">出題順</label>
           <div className="flex gap-4">
             <label className="flex items-center gap-2 cursor-pointer">
-              <input 
-                type="radio" name="order" checked={order === 'RANDOM'} 
+              <input
+                type="radio" name="order" checked={order === 'RANDOM'}
                 onChange={() => setOrder('RANDOM')}
                 className="w-5 h-5 text-blue-600"
               />
               <span>ランダム</span>
             </label>
             <label className="flex items-center gap-2 cursor-pointer">
-              <input 
-                type="radio" name="order" checked={order === 'SEQUENTIAL'} 
+              <input
+                type="radio" name="order" checked={order === 'SEQUENTIAL'}
                 onChange={() => setOrder('SEQUENTIAL')}
                 className="w-5 h-5 text-blue-600"
               />
@@ -461,9 +461,9 @@ function SetupScreen({ sourceType, totalCards, onStart, onBack }: any) {
         {order === 'SEQUENTIAL' && (
           <div className="pl-6 border-l-2 border-slate-200 dark:border-slate-700">
             <label className="block text-xs font-bold text-slate-400 mb-1">開始位置（0 = 最初から）</label>
-            <input 
-              type="number" 
-              min={0} 
+            <input
+              type="number"
+              min={0}
               max={totalCards - 1}
               value={startIndex}
               onChange={(e) => setStartIndex(Number(e.target.value))}
@@ -478,26 +478,26 @@ function SetupScreen({ sourceType, totalCards, onStart, onBack }: any) {
           <label className="block text-sm font-bold text-slate-500 mb-2">出題数 (対象: {totalCards}問)</label>
           <div className="flex flex-wrap gap-2">
             {[10, 20, 50].map(num => (
-               <button
-                 key={num}
-                 onClick={() => setLimit(num)}
-                 className={`px-4 py-2 rounded-full text-sm font-bold border transition
+              <button
+                key={num}
+                onClick={() => setLimit(num)}
+                className={`px-4 py-2 rounded-full text-sm font-bold border transition
                    ${limit === num ? 'bg-slate-800 text-white dark:bg-white dark:text-slate-900' : 'border-slate-300 hover:bg-gray-100 dark:border-slate-600 dark:hover:bg-slate-700'}`}
-               >
-                 {num}問
-               </button>
+              >
+                {num}問
+              </button>
             ))}
             <button
-                 onClick={() => setLimit('ALL')}
-                 className={`px-4 py-2 rounded-full text-sm font-bold border transition
+              onClick={() => setLimit('ALL')}
+              className={`px-4 py-2 rounded-full text-sm font-bold border transition
                    ${limit === 'ALL' ? 'bg-slate-800 text-white dark:bg-white dark:text-slate-900' : 'border-slate-300 hover:bg-gray-100 dark:border-slate-600 dark:hover:bg-slate-700'}`}
-               >
-                 全問
-               </button>
+            >
+              全問
+            </button>
           </div>
         </div>
 
-        <button 
+        <button
           onClick={handleStart}
           className="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-4 rounded-xl shadow-lg transition transform active:scale-95 mt-4"
         >
@@ -509,8 +509,8 @@ function SetupScreen({ sourceType, totalCards, onStart, onBack }: any) {
 }
 
 // --- 3. ゲーム画面 ---
-function GameScreen({ cards, settings, onFinish, onBack }: { 
-  cards: Card[], settings: GameSettings, onFinish: (res: GameResult[]) => void, onBack: () => void 
+function GameScreen({ cards, settings, onFinish, onBack }: {
+  cards: Card[], settings: GameSettings, onFinish: (res: GameResult[]) => void, onBack: () => void
 }) {
   const [index, setIndex] = useState(0);
   const [showAnswer, setShowAnswer] = useState(false);
@@ -528,11 +528,11 @@ function GameScreen({ cards, settings, onFinish, onBack }: {
 
     const normalizedInput = normalizeString(inputVal);
     const normalizedAnswer = normalizeString(currentCard.answer);
-    
+
     // 完全一致判定 (正規化後)
     // カンマ区切りの別解対応などもここで行うと良いが、今回は単純比較
     const isCorrect = normalizedInput === normalizedAnswer;
-    
+
     setInputResult(isCorrect ? 'CORRECT' : 'WRONG');
     setShowAnswer(true);
   };
@@ -544,7 +544,7 @@ function GameScreen({ cards, settings, onFinish, onBack }: {
       isCorrect: isCorrect,
       userAnswer: settings.mode === 'INPUT' ? inputVal : undefined
     };
-    
+
     const nextResults = [...results, newResult];
     setResults(nextResults);
 
@@ -576,15 +576,15 @@ function GameScreen({ cards, settings, onFinish, onBack }: {
 
         {/* 問題表示エリア */}
         <div className="p-8 flex-1 flex flex-col justify-center items-center text-center">
-           <h3 className="text-sm text-slate-400 font-bold uppercase tracking-widest mb-4">Question</h3>
-           <p className="text-2xl md:text-3xl font-bold leading-relaxed whitespace-pre-wrap">
-             {currentCard.question}
-           </p>
+          <h3 className="text-sm text-slate-400 font-bold uppercase tracking-widest mb-4">Question</h3>
+          <p className="text-2xl md:text-3xl font-bold leading-relaxed whitespace-pre-wrap">
+            {currentCard.question}
+          </p>
         </div>
 
         {/* 操作・解答エリア */}
         <div className="bg-slate-50 dark:bg-slate-900/50 p-6 border-t dark:border-slate-700">
-          
+
           {/* --- 入力モード --- */}
           {settings.mode === 'INPUT' && (
             <div className="w-full max-w-lg mx-auto">
@@ -598,8 +598,8 @@ function GameScreen({ cards, settings, onFinish, onBack }: {
                     className="w-full p-4 rounded-xl border-2 border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-800 text-lg focus:border-blue-500 outline-none transition"
                     autoFocus
                   />
-                  <button 
-                    type="submit" 
+                  <button
+                    type="submit"
                     className="bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 rounded-xl transition"
                   >
                     回答する
@@ -626,7 +626,7 @@ function GameScreen({ cards, settings, onFinish, onBack }: {
                     )}
                   </div>
 
-                  <button 
+                  <button
                     onClick={() => goNext(inputResult === 'CORRECT')}
                     className="w-full bg-slate-800 hover:bg-slate-700 text-white py-3 rounded-xl font-bold transition flex items-center justify-center gap-2"
                   >
@@ -641,7 +641,7 @@ function GameScreen({ cards, settings, onFinish, onBack }: {
           {settings.mode === 'FLASHCARD' && (
             <div className="w-full">
               {!showAnswer ? (
-                <button 
+                <button
                   onClick={() => setShowAnswer(true)}
                   className="w-full bg-blue-500 hover:bg-blue-600 text-white font-bold py-8 rounded-xl shadow-md transition text-xl"
                 >
@@ -649,27 +649,27 @@ function GameScreen({ cards, settings, onFinish, onBack }: {
                 </button>
               ) : (
                 <div className="animate-in fade-in slide-in-from-bottom-4 duration-300">
-                   <div className="text-center mb-8">
-                     <h3 className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">Answer</h3>
-                     <p className="text-2xl font-bold text-red-500 dark:text-red-400">{currentCard.answer}</p>
-                   </div>
-                   
-                   <div className="grid grid-cols-2 gap-4">
-                     <button 
-                       onClick={() => goNext(false)}
-                       className="flex flex-col items-center justify-center p-4 rounded-xl border-2 border-red-200 bg-red-50 text-red-600 hover:bg-red-100 dark:bg-red-900/20 dark:border-red-900 dark:text-red-400 transition"
-                     >
-                       <XCircle className="w-8 h-8 mb-2" />
-                       <span className="font-bold">わからない</span>
-                     </button>
-                     <button 
-                       onClick={() => goNext(true)}
-                       className="flex flex-col items-center justify-center p-4 rounded-xl border-2 border-green-200 bg-green-50 text-green-600 hover:bg-green-100 dark:bg-green-900/20 dark:border-green-900 dark:text-green-400 transition"
-                     >
-                       <CheckCircle className="w-8 h-8 mb-2" />
-                       <span className="font-bold">わかった！</span>
-                     </button>
-                   </div>
+                  <div className="text-center mb-8">
+                    <h3 className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">Answer</h3>
+                    <p className="text-2xl font-bold text-red-500 dark:text-red-400">{currentCard.answer}</p>
+                  </div>
+
+                  <div className="grid grid-cols-2 gap-4">
+                    <button
+                      onClick={() => goNext(false)}
+                      className="flex flex-col items-center justify-center p-4 rounded-xl border-2 border-red-200 bg-red-50 text-red-600 hover:bg-red-100 dark:bg-red-900/20 dark:border-red-900 dark:text-red-400 transition"
+                    >
+                      <XCircle className="w-8 h-8 mb-2" />
+                      <span className="font-bold">わからない</span>
+                    </button>
+                    <button
+                      onClick={() => goNext(true)}
+                      className="flex flex-col items-center justify-center p-4 rounded-xl border-2 border-green-200 bg-green-50 text-green-600 hover:bg-green-100 dark:bg-green-900/20 dark:border-green-900 dark:text-green-400 transition"
+                    >
+                      <CheckCircle className="w-8 h-8 mb-2" />
+                      <span className="font-bold">わかった！</span>
+                    </button>
+                  </div>
                 </div>
               )}
             </div>
@@ -677,7 +677,7 @@ function GameScreen({ cards, settings, onFinish, onBack }: {
 
         </div>
       </div>
-      
+
       <button onClick={onBack} className="mt-4 text-slate-400 hover:text-slate-600 text-sm underline self-center">
         中断してメニューに戻る
       </button>
@@ -695,17 +695,17 @@ function ResultScreen({ results, allCards, onRetryWrong, onBackToMenu }: any) {
     <div className="flex flex-col items-center animate-in zoom-in-95 duration-500">
       <div className="w-full max-w-md bg-white dark:bg-slate-800 rounded-2xl shadow-xl p-8 text-center">
         <h2 className="text-2xl font-bold mb-6">結果発表</h2>
-        
+
         <div className="relative w-40 h-40 mx-auto mb-6 flex items-center justify-center">
-           <div className="absolute inset-0 rounded-full border-8 border-slate-100 dark:border-slate-700"></div>
-           <div 
-             className={`absolute inset-0 rounded-full border-8 ${score >= 80 ? 'border-green-500' : score >= 50 ? 'border-yellow-500' : 'border-red-500'} transition-all duration-1000`}
-             style={{ clipPath: `inset(0 0 ${100 - score}% 0)` }} 
-           ></div>
-           <div className="z-10 flex flex-col">
-             <span className="text-5xl font-bold">{score}</span>
-             <span className="text-xs text-slate-400">POINT</span>
-           </div>
+          <div className="absolute inset-0 rounded-full border-8 border-slate-100 dark:border-slate-700"></div>
+          <div
+            className={`absolute inset-0 rounded-full border-8 ${score >= 80 ? 'border-green-500' : score >= 50 ? 'border-yellow-500' : 'border-red-500'} transition-all duration-1000`}
+            style={{ clipPath: `inset(0 0 ${100 - score}% 0)` }}
+          ></div>
+          <div className="z-10 flex flex-col">
+            <span className="text-5xl font-bold">{score}</span>
+            <span className="text-xs text-slate-400">POINT</span>
+          </div>
         </div>
 
         <div className="grid grid-cols-2 gap-4 mb-8">
@@ -721,14 +721,14 @@ function ResultScreen({ results, allCards, onRetryWrong, onBackToMenu }: any) {
 
         <div className="flex flex-col gap-3">
           {wrongCount > 0 && (
-            <button 
+            <button
               onClick={onRetryWrong}
               className="w-full bg-red-500 hover:bg-red-600 text-white py-3 rounded-xl font-bold shadow-lg transition"
             >
               間違えた問題のみ復習 ({wrongCount}問)
             </button>
           )}
-          <button 
+          <button
             onClick={onBackToMenu}
             className="w-full bg-slate-800 hover:bg-slate-900 text-white py-3 rounded-xl font-bold shadow transition"
           >
@@ -743,7 +743,7 @@ function ResultScreen({ results, allCards, onRetryWrong, onBackToMenu }: any) {
 // --- 5. 苦手リスト画面 ---
 function WrongListScreen({ allCards, wrongHistory, onBack, onStartReview }: any) {
   const wrongCards = allCards.filter((c: Card) => wrongHistory[c.id] > 0);
-  
+
   return (
     <div className="bg-white dark:bg-slate-800 rounded-xl shadow-lg min-h-[80vh] flex flex-col animate-in slide-in-from-right-4 duration-300">
       <div className="p-4 border-b dark:border-slate-700 flex justify-between items-center sticky top-0 bg-white dark:bg-slate-800 z-10 rounded-t-xl">
@@ -754,21 +754,21 @@ function WrongListScreen({ allCards, wrongHistory, onBack, onStartReview }: any)
           <h2 className="text-lg font-bold">苦手リスト</h2>
         </div>
         {wrongCards.length > 0 && (
-           <button 
-             onClick={onStartReview}
-             className="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-lg text-sm font-bold shadow"
-           >
-             まとめて復習
-           </button>
+          <button
+            onClick={onStartReview}
+            className="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-lg text-sm font-bold shadow"
+          >
+            まとめて復習
+          </button>
         )}
       </div>
 
       <div className="p-4 overflow-y-auto flex-1">
         {wrongCards.length === 0 ? (
-           <div className="h-full flex flex-col items-center justify-center text-slate-400">
-             <CheckCircle className="w-12 h-12 mb-2 text-green-300" />
-             <p>苦手な単語はありません！</p>
-           </div>
+          <div className="h-full flex flex-col items-center justify-center text-slate-400">
+            <CheckCircle className="w-12 h-12 mb-2 text-green-300" />
+            <p>苦手な単語はありません！</p>
+          </div>
         ) : (
           <div className="space-y-3">
             {wrongCards.map((card: Card) => (
